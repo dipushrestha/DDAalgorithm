@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+    div {
+      margin: 1% 2%;
+    }
+
+    table {
+      float: left;
+      margin: 1% 2%;  
+    }
+
+    input {
+      width: 40px;
+    }
+
+    input[type="button"] {
+      width: 100px;
+    }
+  </style>
+</head>
+<body>
+  <div>
+      <label>Initial Point</label>
+      <input type="number" id="x1" placeholder="x1">
+      <input type="number" id="y1" placeholder="y1">
+      <label>Destination Point</label>
+      <input type="number" id="x2" placeholder="x2">
+      <input type="number" id="y2" placeholder="y2">
+      <input type="button" value="Draw Line">
+  </div>
+  <canvas id="myCanvas" width="600" height="600" style="border:1px solid #000000; margin: 1% 2%"></canvas>
+  <table id="table" border="1">
+    <tr>
+      <th>k</th>
+      <th>Plot x</th>
+      <th>Plot y</th>
+    </tr>
+  </table>
+  <script>
+    function sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    const canvas = document.getElementById('myCanvas');
+    const context = canvas.getContext('2d');
+    const table = document.querySelector('#table');
+
+    async function DDALine(x1, y1, x2, y2) {
+      let x, y, dx, dy, incrx, incry, steps;
+      dx = x2 - x1;
+      dy = y2 - y1;
+      if (Math.abs(dx) > Math.abs(dy)) {
+        steps = Math.abs(dx);
+      } else {
+        steps = Math.abs(dy);
+      }
+      x = x1;
+      y = y1;
+      incrx = dx / steps;
+      incry = dy / steps;
+      for(let k = 0; k <= steps; k++) {
+        context.fillRect(x, y, 1, 1);
+        table.innerHTML += getTableRow(k, x, y);
+        x += incrx;
+        y += incry;
+        await sleep(100);
+      }
+    }
+
+    function getTableRow(k, x, y) {
+      return `<tr>
+        <td>${k}</td>
+        <td>${Math.round(x)}</td>
+        <td>${Math.round(y)}</td>
+      </tr>`;
+    }
+     
+    document.querySelector('input[type="button"]').addEventListener('click', drawLine);
+    function drawLine() {
+      context.clearRect(0, 0, canvas.width, canvas.height);
+      table.innerHTML = '<tr><th>k</th><th>Plot x</th><th>Plot y</th></tr>';
+      const x1 = Number.parseInt(document.querySelector('#x1').value),
+        y1 = Number.parseInt(document.querySelector('#y1').value),
+        x2 = Number.parseInt(document.querySelector('#x2').value),
+        y2 = Number.parseInt(document.querySelector('#y2').value);
+      DDALine(x1, y1, x2, y2);
+    }
+  </script>
+</body>
+</html>
